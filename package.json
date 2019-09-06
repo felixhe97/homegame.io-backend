@@ -1,0 +1,29 @@
+{
+  "name": "homegame.io",
+  "version": "1.0.0",
+  "description": "Multiplayer browser poker rooms",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/felixhe97/homegame.io-backend.git"
+  },
+  "keywords": [
+    "poker",
+    "poker",
+    "room",
+    "homegame.io",
+    "homegame"
+  ],
+  "author": "felixhe97",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/felixhe97/homegame.io-backend/issues"
+  },
+  "homepage": "https://github.com/felixhe97/homegame.io-backend#readme",
+  "devDependencies": {
+    "jest": "^24.9.0"
+  }
+}
