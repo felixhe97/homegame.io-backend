@@ -1,1 +1,0 @@
-const Player = require('../src/player.js');

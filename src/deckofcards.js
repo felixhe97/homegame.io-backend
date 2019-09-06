@@ -12,6 +12,7 @@ class Deck {
                 this.cards[index] = temp;
             }
         }
+        return true;
     }
 
     dealCards(number) {
