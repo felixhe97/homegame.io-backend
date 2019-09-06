@@ -15,7 +15,9 @@ class Deck {
     }
 
     dealCards(number) {
-        if (number < 1) {
+        if (!number) {
+            number = this.cards.length;
+        } else if (number < 1) {
             throw new Error("Invalid number of cards to deal");
         } else {
             return this.cards.slice(0, number);

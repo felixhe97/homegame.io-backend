@@ -1,7 +1,7 @@
 class Player {
     hand;
     amountOfChips;
-    status; // -1 is unseated, 0 is not ready, 1 is ready, 2 is in action, 3 is in countdown
+    status; // -1 is unseated, 0 is folded/busy, 1 is ready, 2 is in action, 3 is in countdown
 
     constructor(playerID, chips = 0) {
         this.id = playerID;

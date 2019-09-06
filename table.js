@@ -1,4 +1,5 @@
 
+// Table keeps track of seats open, switching seats
 class Table {
     constructor(tableID, hostPlayer, maxNumPeople) {
         this.id = tableID;
@@ -51,3 +52,4 @@ class Table {
 }
 
 module.exports = Table;
+

@@ -28,15 +28,10 @@ class PokerTable extends Table {
 
     nextHand() {
         this.deck.shuffle();
-        this.cards = this.deck.dealCards();
-        for (let x = 0; x < this.seats.length; ++x) {
-            if (seats[x] && seats[x].status == 1) {
-                let tempHand = [];
-                tempHand.push(this.cards.pop());
-                tempHand.push(this.cards.pop());
-                seats[x].hand = tempHand;
-            }
-        }
+        let numCardsNeeded = 5 + this.seatsFilled() * 2;
+        this.cards = this.deck.dealCards(numCardsNeeded);
+
+        // begin round
     }
 }
 

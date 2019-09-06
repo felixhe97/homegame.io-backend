@@ -25,5 +25,9 @@
   "homepage": "https://github.com/felixhe97/homegame.io-backend#readme",
   "devDependencies": {
     "jest": "^24.9.0"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^2.2.0"
   }
 }
