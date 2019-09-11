@@ -4,7 +4,8 @@
   "description": "Multiplayer browser poker rooms",
   "main": "index.js",
   "scripts": {
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "start": "nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -24,7 +25,8 @@
   },
   "homepage": "https://github.com/felixhe97/homegame.io-backend#readme",
   "devDependencies": {
-    "jest": "^24.9.0"
+    "jest": "^24.9.0",
+    "nodemon": "^1.19.2"
   },
   "dependencies": {
     "express": "^4.17.1",
