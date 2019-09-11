@@ -1,53 +1,39 @@
 let PokerDeck = require('./deckofcards.js').Classic52;
-let stringToIntegerMap = require('./deckofcards.js').firstStringToIntegerMap;
+let mapCard = require('./deckofcards.js').firstIntegerToStringMap;
+let cardMap = require('./deckofcards.js').firstStringToIntegerMap;
+let mapSuit = require('./deckofcards.js').secondIntegerToStringMap;
+let suitMap = require('./deckofcards.js').secondStringToIntegerMap;
 let Player = require('./player.js');
 
-// if a player has folded, then nothing is to be done, this will only rank the players at showdown
-
-function flushPossible(suitCount) {
-    for (let [key, val] of suitCount) {
-        if (val >= 3) {
-            return [key, val];
+function checkFlush(suitArr) {
+    for (let x = 0; x < suitArr.length; ++x) {
+        if (suitArr[x].length >= 5) {
+            return [x, suitArr[x]];
         }
     }
     return undefined;
 }
 
-/**
- * 
- * @param {Array<String>} communityCards 
- * @returns {Array<Array<Number>, Array<String, Number> | undefined>}
- */
-function communityCardInfo(communityCards) {
-    if (!communityCards || communityCards.length != 5) {
-        return;
-    } else {
-        let suitCount = new Map([
-            [0, 0],
-            [1, 0],
-            [2, 0],
-            [3, 0]
-        ]);
-
-        let cardCount = Array(13).fill(0);
-        for (let card of communityCards) {
-            ++cardCount[cardMap.get(card[0])];
-            ++suitCount[card[1]];
+function checkStraightFlush(flushCards) {
+    if (!flushCards || flushCards.length >= 5) {
+        for (let x = flushCards.length - 1; x >= 4; --x) {
+            if (flushCards[x] - 4 === flushCards[x-4]) {
+                return flushCards[x];
+            }
         }
-        let flushArr = flushPossible(suitCount);
-        if (flushArr) {
-            return [cardCount, flushArr];
-        } else {
-            return [cardCount, undefined];
+        if (mapCard.get(flushCards[4]) === '5' && mapCard.get(flushCards.pop()) === 'a') {
+            return flushCards[4];
         }
     }
+    return undefined;
 }
 
-function hasStraight(cardArr) {
+function checkStraight(cardArr) {
     let acc = 0;
     let highEnd = undefined;
+    console.log(cardArr);           
     for (let x = 0; x < cardArr.length; ++x) {
-        if (cardArr[x]) {
+        if (cardArr[x].length) {
             ++acc;
             if (acc >= 5) {
                 highEnd = x;
@@ -56,102 +42,139 @@ function hasStraight(cardArr) {
             acc = 0;
         }
     }
-    return highEnd;
-}
-
-function playerHandStrength(playerHand, communityCards) {
-    if (!playerHand || playerHand.length != 2 || !communityCards || communityCards.length != 5) {
-        return;
+    if (highEnd) {
+        return highEnd;
+    } else if (cardArr[cardMap.get('a')] && cardArr[cardMap.get('2')] && cardArr[cardMap.get('3')] && cardArr[cardMap.get('4')] && cardArr[cardMap.get('5')]) {
+        return cardMap.get('5');
     } else {
-        let suitCount = new Map([
-            ['s', 0],
-            ['d', 0],
-            ['h', 0],
-            ['c', 0]
-        ]);
-        let cardCount = Array(13).fill(0);
-
-        let tempArr = [];
-        tempArr.push(playerHand);
-        tempArr.push(communityCards);
-
-        for (let card of tempArr) {
-            ++cardCount[card[0]];
-            ++suitCount.get(card[1]);
-        }
-
-        let flushSuit = flushPossible(suitCount);
-        if (flushSuit) {
-
-        } else {
-
-        }
+        return undefined;
     }
 }
 
-function hasStraight(cardCount) {
-    let acc = 0;
-    for (let x = 0; x < cardCount.length; ++x) {
-        if (cardCount[x] > 0) {
-            ++acc;
-            if (acc === 5) {
-                return x;
-            }
-        } else {
-            acc = 0;
+
+/**
+ * Returns best hand and its ranking from given cards
+ * 
+ * 8 is straight-flush, 7 is quad, 6 is full-house, 5 is flush, 4 is straight, 3 is trip, 2 is two pairs, 1 is one pair, 0 is high card
+ * 
+ * @param {Array<String>} arrOfCards
+ */
+function rankHand(arrOfCards) {
+    let cardArr = Array(14).fill(0);
+    let suitArr = [[],[],[],[],[],[]];
+    for (let card of arrOfCards) {
+        ++cardArr[cardMap.get(card[0])];
+        suitArr[suitMap.get(card[1])].push(cardMap.get(card[0]));
+    }
+
+    let checkFlushRetVal = checkFlush(suitArr);
+    let flushCards = undefined;
+    let suitOfFlush = undefined;
+    if (checkFlushRetVal) {
+        suitOfFlush = checkFlushRetVal[0];
+        flushCards = checkFlushRetVal[1];
+        var highStraightFlushCard = checkStraightFlush(Array.from(flushCards));
+        if (highStraightFlushCard) {
+            return [8, highStraightFlushCard];
         }
     }
-    // check broadway straight
-    if (cardCount[0] && cardCount[9] && cardCount[10] && cardCount[11] && cardCount[12]) {
-        return 0;
+
+    let quad = undefined;
+    let trip = [];
+    let pair = [];
+    let highCard = [];
+    for (let x = 0; x < cardArr.length; ++x) {
+        if (cardArr[x] == 4) {
+            quad = x;
+        } else if (cardArr[x] == 3) {
+            trip.push(x);
+        } else if (cardArr[x] == 2) {
+            pair.push(x);
+        } else if (cardArr[x] == 1) {
+            highCard.push(x);
+        }
+    }
+
+    let highStraightCard = checkStraight(cardArr);
+
+    if (quad) {
+        return [7, quad, highCard.pop()];
+    } else if (trip.length > 1) {
+        return [6, trip.pop(), trip.pop()];
+    } else if (trip.length == 1 && pair.length >= 1) {
+        return [6, trip.pop(), pair.pop()];
+    } else if (flushCards) {
+        return [5, flushCards.pop(), flushCards.pop(), flushCards.pop(), flushCards.pop(), flushCards.pop()];
+    } else if (highStraightCard) {
+        return [4, highStraightCard];
+    } else if (trip.length == 1) {
+        return [3, trip.pop(), highCard.pop(), highCard.pop()];
+    } else if (pair.length > 2) {
+        let arrToReturn = [2, pair.pop(), pair.pop()];
+        let compareWithHighCard = pair.pop();
+        let possibleHighCard = highCard.pop();
+        if (compareWithHighCard > possibleHighCard) {
+            arrToReturn.push(compareWithHighCard);
+            return arrToReturn;
+        } else {
+            arrToReturn.push(possibleHighCard);
+            return arrToReturn;
+        }
+    } else if (pair.length == 2) {
+        return [2, pair.pop(), pair.pop(), highCard.pop()];
+    } else if (pair.length == 1) {
+        return [1, pair.pop(), highCard.pop(), highCard.pop(), highCard.pop(), highCard.pop()];
     } else {
-        return;
+        return [0, highCard.pop(), highCard.pop(), highCard.pop(), highCard.pop(), highCard.pop()];
     }
 }
 
-
-function rankHands(playerArr, communityCards) {
-    if (!playerArr || playerArr.length!communityCards || communityCards.length != 5) {
-        return;
+function rankPlayer(playerHand, communityCards) {
+    if (!playerHand || playerHand.length != 2 || !communityCards || communityCards.length != 5){
+        return undefined;
     }
-
-    // first figure out what community cards has
-    for (let i = 0; i < communityCards.length; ++i) {
-
-    }
-
-
-
-    let arrOfRanks = [];
-    communityCards.sort();
-
-    let heartCount = [];
-    let clubCount = [];
-    let spadeCount = [];
-    let diamondCount = [];
-    for (let i = 0; i < communityCards.length; ++i) {
-        if (communityCards[i][1] == "s") {
-            spadeCount.push(communityCards[i]);
-        } else if (communityCards[i][1] == "c") {
-            clubCount.push(communityCards[i]);
-        } else if (communityCards[i][1] == "d") {
-            diamondCount.push(communityCards[i]);
-        } else {
-            heartCount.push(communityCards[i]);
+    let temp = playerHand.concat(communityCards);
+    let handRank = rankHand(temp);
+    let points = 0;
+    if (handRank) {
+        console.log(handRank);
+        switch(handRank[0]) {
+            case 8:
+                points = 8 * 100000 + handRank[1];
+                return [points, "straight flush, " + mapCard.get(handRank[1]) + " high"];
+            case 7:
+                points = 7 * 100000 + handRank[1] * 100 + handRank[2];
+                return [points, "quads of " + mapCard.get(handRank[1]) + ", " + mapCard.get(handRank[2]) + " kicker"];
+            case 6:
+                points = 6 * 100000 + handRank[1] * 100 + handRank[2];
+                return [points, "full house, " + mapCard.get(handRank[1]) + " full of " + mapCard.get(handRank[2])];
+            case 5:
+                points = 5 * 100000 + handRank[1] * 10000 + handRank[2] * 1000 + handRank[3] * 100 + handRank[4] * 10 + handRank[5];
+                return [points, "flush, " + mapCard.get(handRank[1]) + " high"];  
+            case 4:
+                points = 4 * 100000 + handRank[1];
+                return [points, "straight, " + mapCard.get(handRank[1]) + " high"];
+            case 3:
+                points = 3 * 100000 + handRank[1] * 10000 + handRank[2] * 1000 + handRank[3] * 100;
+                return [points, "trips of " + mapCard.get(handRank[1]) + ", " + mapCard.get(handRank[2]) + " kicker"];
+            case 2:
+                points = 2 * 100000 + handRank[1] * 10000 + handRank[2] * 1000;
+                return [points, "2 pairs, " + mapCard.get(handRank[1]) + " and " + mapCard.get(handRank[2]) + ", " + mapCard.get(handRank[3]) + " kicker"];
+            case 1:
+                points = 100000 + handRank[1] * 10000 + handRank[2] * 1000 + handRank[3] * 100 + handRank[4] * 10 + handRank[5];
+                return [points, "pair of " + mapCard.get()]
+            case 0:
+                points = handRank[1] * 10000 + handRank[2] * 1000 + handRank[3] * 100 + handRank[4] * 10 + handRank[5];
+                return [points, mapCard.get(handRank[1]) + " high"];
+            default:
+                throw new Error("Invalid handRank return code");
         }
     }
 
-    for (let i = 0; i < playerArr; ++i) {
-        if (playerArr[i].hand) {
-            if (hasStraight(playerArr[i].hand, communityCards)) {
-
-            } else if (hasFlush(playerArr[i].hand, communityCards)) {
-
-            } else {
-
-            }
-
-            arrOfRanks.push([playerArr[i], rank]);
-        }
-    }
 }
+
+exports.checkFlush = checkFlush;
+exports.checkStraightFlush = checkStraightFlush;
+exports.checkStraight = checkStraight;
+exports.rankHand = rankHand;
+exports.rankPlayer = rankPlayer;
