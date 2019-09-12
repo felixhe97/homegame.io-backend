@@ -1,27 +1,35 @@
 class Deck {
     constructor(typeOfCards) {
-        this.cards = [...typeOfCards];
+        this._cards = [...typeOfCards];
+        this._isShuffled = false;
+    }
+
+    get isShuffled() {
+        return this._isShuffled;
     }
 
     shuffle() {
-        for (let i = this.cards.length - 1; i > 0; --i) {
+        for (let i = this._cards.length - 1; i > 0; --i) {
             let index = Math.floor(Math.random() * (i + 1));
             if (index != i){
-                let temp = this.cards[i];
-                this.cards[i] = this.cards[index];
-                this.cards[index] = temp;
+                let temp = this._cards[i];
+                this._cards[i] = this._cards[index];
+                this._cards[index] = temp;
             }
         }
+        this._isShuffled = true;
         return true;
     }
 
+    // associate each of these dealt cards with a round
     dealCards(number) {
         if (!number) {
-            number = this.cards.length;
+            number = this._cards.length;
         } else if (number < 1) {
             throw new Error("Invalid number of cards to deal");
         } else {
-            return this.cards.slice(0, number);
+            this._isShuffled = false;
+            return this._cards.slice(0, number);
         }
     }
 }

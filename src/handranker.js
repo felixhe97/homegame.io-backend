@@ -8,7 +8,7 @@ let Player = require('./player.js');
 function checkFlush(suitArr) {
     for (let x = 0; x < suitArr.length; ++x) {
         if (suitArr[x].length >= 5) {
-            return [x, suitArr[x]];
+            return suitArr[x].sort();
         }
     }
     return undefined;
@@ -31,9 +31,8 @@ function checkStraightFlush(flushCards) {
 function checkStraight(cardArr) {
     let acc = 0;
     let highEnd = undefined;
-    console.log(cardArr);           
     for (let x = 0; x < cardArr.length; ++x) {
-        if (cardArr[x].length) {
+        if (cardArr[x]) {
             ++acc;
             if (acc >= 5) {
                 highEnd = x;
@@ -67,13 +66,9 @@ function rankHand(arrOfCards) {
         suitArr[suitMap.get(card[1])].push(cardMap.get(card[0]));
     }
 
-    let checkFlushRetVal = checkFlush(suitArr);
-    let flushCards = undefined;
-    let suitOfFlush = undefined;
-    if (checkFlushRetVal) {
-        suitOfFlush = checkFlushRetVal[0];
-        flushCards = checkFlushRetVal[1];
-        var highStraightFlushCard = checkStraightFlush(Array.from(flushCards));
+    let flushCards = checkFlush(suitArr);
+    if (flushCards) {
+        let highStraightFlushCard = checkStraightFlush(Array.from(flushCards));
         if (highStraightFlushCard) {
             return [8, highStraightFlushCard];
         }
@@ -84,7 +79,9 @@ function rankHand(arrOfCards) {
     let pair = [];
     let highCard = [];
     for (let x = 0; x < cardArr.length; ++x) {
-        if (cardArr[x] == 4) {
+        if (cardArr[x] > 4) {
+            throw new Error("Should have max 4 cards in a suit");
+        } else if (cardArr[x] == 4) {
             quad = x;
         } else if (cardArr[x] == 3) {
             trip.push(x);
@@ -137,34 +134,33 @@ function rankPlayer(playerHand, communityCards) {
     let handRank = rankHand(temp);
     let points = 0;
     if (handRank) {
-        console.log(handRank);
         switch(handRank[0]) {
             case 8:
-                points = 8 * 100000 + handRank[1];
+                points = 8 * 1000000 + handRank[1];
                 return [points, "straight flush, " + mapCard.get(handRank[1]) + " high"];
             case 7:
-                points = 7 * 100000 + handRank[1] * 100 + handRank[2];
+                points = 7 * 1000000 + handRank[1] * 100 + handRank[2];
                 return [points, "quads of " + mapCard.get(handRank[1]) + ", " + mapCard.get(handRank[2]) + " kicker"];
             case 6:
-                points = 6 * 100000 + handRank[1] * 100 + handRank[2];
+                points = 6 * 1000000 + handRank[1] * 100 + handRank[2];
                 return [points, "full house, " + mapCard.get(handRank[1]) + " full of " + mapCard.get(handRank[2])];
             case 5:
-                points = 5 * 100000 + handRank[1] * 10000 + handRank[2] * 1000 + handRank[3] * 100 + handRank[4] * 10 + handRank[5];
+                points = 5 * 1000000 + handRank[1] * 10000 + handRank[2] * 1000 + handRank[3] * 100 + handRank[4] * 10 + handRank[5];
                 return [points, "flush, " + mapCard.get(handRank[1]) + " high"];  
             case 4:
-                points = 4 * 100000 + handRank[1];
+                points = 4 * 1000000 + handRank[1];
                 return [points, "straight, " + mapCard.get(handRank[1]) + " high"];
             case 3:
-                points = 3 * 100000 + handRank[1] * 10000 + handRank[2] * 1000 + handRank[3] * 100;
+                points = 3 * 1000000 + handRank[1] * 10000 + handRank[2] * 1000 + handRank[3] * 100;
                 return [points, "trips of " + mapCard.get(handRank[1]) + ", " + mapCard.get(handRank[2]) + " kicker"];
             case 2:
-                points = 2 * 100000 + handRank[1] * 10000 + handRank[2] * 1000;
+                points = 2 * 1000000 + handRank[1] * 10000 + handRank[2] * 1000;
                 return [points, "2 pairs, " + mapCard.get(handRank[1]) + " and " + mapCard.get(handRank[2]) + ", " + mapCard.get(handRank[3]) + " kicker"];
             case 1:
-                points = 100000 + handRank[1] * 10000 + handRank[2] * 1000 + handRank[3] * 100 + handRank[4] * 10 + handRank[5];
+                points = 1000000 + handRank[1] * 10000 + handRank[2] * 1000 + handRank[3] * 100 + handRank[4] * 10 + handRank[5];
                 return [points, "pair of " + mapCard.get()]
             case 0:
-                points = handRank[1] * 10000 + handRank[2] * 1000 + handRank[3] * 100 + handRank[4] * 10 + handRank[5];
+                points = handRank[1] * 100000 + handRank[2] * 1000 + handRank[3] * 100 + handRank[4] * 10 + handRank[5];
                 return [points, mapCard.get(handRank[1]) + " high"];
             default:
                 throw new Error("Invalid handRank return code");
