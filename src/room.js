@@ -2,18 +2,26 @@
 // when players join, can change their options here
 
 class Room {
-    constructor(hostID, linkURL, roomPassword = 0) {
+    constructor(hostID, linkURL, roomPassword = 0, maxNum = 20) {
         this.hostID = hostID;
         this.linkURL = linkURL;
         this.dateCreated = new Date();
-        if (!roomPassword) {
-            this.password = undefined;
+        if (!maxNum || maxNum < 2 || maxNum > 20) {
+            this._maxOccupancy = 20;
         } else {
-            this.password = roomPassword;
+            this._maxOccupancy = maxNum;
+        }
+        if (!roomPassword) {
+            this._password = undefined;
+        } else {
+            this._password = roomPassword;
         }
     }
 
-    spectate() {
+    spectate(playerID) {
+        if (playerID) {
+            // join chat
+        }
 
     }
 

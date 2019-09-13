@@ -4,10 +4,10 @@
 // returns updated stacks of each player
 // if player leaves, acts as fold
 class Round {
-    constructor(players, shuffledCards, buttonPosition, blinds) {
+    constructor(players, buttonPosition, blinds) {
         this.dateCreated = new Date();
         //this.id = ++handID;
-        this.cards = shuffledCards;
+        this.cards = globalDeck.shuffleAndDeal(5 + players.length * 2);
         this.buttonPosition = buttonPosition;
         this.blinds = blinds;
         this.players = players;
