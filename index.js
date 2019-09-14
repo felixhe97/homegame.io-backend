@@ -1,18 +1,18 @@
-const app = require('express')();
-const http = require('http').createServer(app);
-const socketIOServer = require('socket.io')(http);
+const cluster = require('cluster');
+const numberOfCPU = require('os').cpus().length;
 
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
-});
+if (cluster.isMaster) {
+    console.log(`Master ${process.pid} is running`);
+    console.log(`Setting up ${numberOfCPU} workers`);
+    for (let x = 0; x < numberOfCPU; ++x) {
+        cluster.fork();
+    }
+} else {
+    console.log(`Worker ${process.pid} has started`);
+}
 
-socketIOServer.on("connection", (socket) => {
-    console.log("a new connection");
-    socket.on('disconnect', () => {
-        console.log("a user disconnected");
-    });
-});
-
-app.listen(3000, () => {
-    console.log("app started, listening on 3000");
+cluster.on('exit', (worker, code, signal)=>{
+    console.log(`Worker ${worker.id} has exited`);
+    console.log("Starting a new one");
+    cluster.fork();
 });
