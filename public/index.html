@@ -1,0 +1,139 @@
+<html lang="en" dir="ltr" prefix="og: http://ogp.me/ns#">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>homegame.io</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Browser-based multiplayer poker room">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="homegame.io">
+    <meta property="og:url" content="homegame.io/">
+    <meta property="og:description" content="Browser-based multiplayer poker room">
+    <meta property="og:image" content="TODO">
+    <meta name="twitter:card" content="summary_large_image">
+</head>
+<style>
+    .css-grid {
+        display: grid;
+        width: 100%;
+        height: 100%;
+        grid-template-columns: repeat(10, 10%);
+        grid-template-rows: repeat(10, 10%);
+    }
+
+    #roomHeader {
+        grid-column: 4 / 11;
+        grid-row: 1;
+        background-color: #fff4e6;
+        text-align: center;
+    }
+
+    #roomChat {
+        grid-column: 1 / 4;
+        grid-row: 1 / 10;
+        overflow: scroll;
+    }
+
+    #chatForm {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        grid-column: 1 / 4;
+        grid-row: 10 / 11;
+    }
+
+    #chatButtons {
+        width: 100%;
+        height: 40%;
+    }
+    
+    #chatInputBox {
+        width: 100%;
+        height: 60%;
+        overflow: hidden;
+    }
+
+    #roomGame {
+        grid-column: 4 / 11;
+        grid-row: 2 / 11;
+    }
+</style>
+<body>
+    <div class="css-grid">
+        <header id="roomHeader">Homegame.io - Room xxxxx, X-max 50NLHE</header>
+        <ul id="roomChat"></ul>
+        <form id="chatForm" action="">
+            <div id="chatButtons">
+                <button id="chatFilter" type="button">Chat Only</button>
+                <button id="logFilter" type="button">Game Log Only</button>
+                <button id="seeBoth" type="button">Both</button>
+                <button id="clearChat" type="button">Clear Chat</button>
+            </div>
+            <input id="chatInputBox" type="text" spellcheck=false autocomplete="off" />
+        </form>
+        <main id="roomGame">
+
+        </main>
+    </div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+<script>
+    let myUsername = window.prompt("Please enter your username");
+    while (!myUsername || myUsername.length > 10) {
+        myUsername = window.prompt("Please enter a username between 1 and 10 characters");
+    }
+    (function () {
+        const chatSocket = io();
+        const chat = document.getElementById('roomChat');
+        const chatInput = document.getElementById('chatInputBox');
+
+        chatSocket.on('connect', () => {
+            chatSocket.emit('add user', myUsername);
+            let listItem = document.createElement('li');
+            listItem.textContent = `Welcome to Room X, ${myUsername}`;
+            chat.appendChild(listItem);
+        });
+
+        document.getElementById('chatForm').addEventListener('submit', (event) => {
+            event.preventDefault();
+            if (chatInput.value != "") {
+                chatSocket.emit('chat message', {
+                    username: myUsername,
+                    text: chatInput.value
+                });
+            }
+            chatInput.value = "";
+        });
+
+        chatSocket.on('user joined', (userWhoJoined) => {
+            let listItem = document.createElement('li');
+            listItem.textContent = `${userWhoJoined.username} has joined, ${userWhoJoined.numPeople} in room`;
+            chat.appendChild(listItem);
+        });
+
+        chatSocket.on('user left', (userWhoLeft) => {
+            let listItem = document.createElement('li');
+            listItem.textContent = `${userWhoLeft.username} has joined, ${userWhoLeft.numPeople} in room`;
+            chat.appendChild(listItem);
+        });
+
+        chatSocket.on('chat message', (message) => {
+            let listItem = document.createElement('li');
+            listItem.textContent = `${message.username}: ${message.text}`;
+            chat.appendChild(listItem);
+        });
+
+        /*
+        // gamelog stuff
+        chatSocket.on('game info', (info)=>{
+            let listItem = document.createElement('li');
+            listItem.textContent = info;
+            gamelog.appendChild(listItem);
+        });
+        */
+
+    })();
+</script>
+
+</html>

@@ -13,6 +13,10 @@ class Player {
         }
     }
 
+    get username() {
+        return this.id;
+    }
+
     bet(betAmount){
         if (typeof betAmount != "number" || !(betAmount instanceof Number)) {
             throw new Error("Bet amount is not a number");
