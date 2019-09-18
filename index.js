@@ -1,6 +1,9 @@
 const cluster = require('cluster');
 const numberOfCPU = require('os').cpus().length;
 
+// TODO add socket.io-redis and sticky-session/own implementation
+// to enable clustering while upgrading sockets
+
 if (cluster.isMaster) {
     console.log(`Master ${process.pid} is running`);
     console.log(`Setting up ${numberOfCPU} workers`);

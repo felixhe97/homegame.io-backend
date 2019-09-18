@@ -1,4 +1,4 @@
-// TODO remove express and have static served from CDN  
+// TODO remove express and have static assets served from CDN  
 const express = require('express');
 const app = express();
 const httpServer = require('http').createServer(app);
