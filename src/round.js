@@ -12,6 +12,7 @@ class Round {
         this.blinds = blinds;
         this.players = players;
         this.handHistory = {};
+        this.pot = 0;
     }
 
     dealPlayers() {
@@ -67,5 +68,18 @@ class Round {
 
     riverAction() {
 
+    }
+
+    showdown() {
+
+    }
+
+
+    // if player folded/pre-folded, update their account if chipamount changed
+
+    conclusion(winningPlayers, button) {
+        // on conclusion of hand, give winning players equal share of pot
+        // calculate OOP, give to OOP
+        
     }
 }

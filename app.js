@@ -1,4 +1,4 @@
-  
+// TODO remove express and have static served from CDN  
 const express = require('express');
 const app = express();
 const httpServer = require('http').createServer(app);
@@ -13,15 +13,43 @@ app.disable('x-powered-by');
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+const onlineRooms = new Map();
+app.get('/game/:gameID', (req, res)=>{
+    if (req.params.gameID && req.params.gameID.length > 1) {
+        if (onlineRooms.get(req.params.gameID)) {
+            onlineRooms.get(req.params.gameID).addPlayer();
+        } else {
+            onlineRooms.set(req.params.gameID, socketIOServer.of('/' + req.params.gameID));
+            onlineRooms.get(req.params.gameID).on('connection', (socket) => {
+
+            });
+        }
+    }
+});
+
+
+// all SocketIO things should be here only
 socketIOServer.on("connection", (socket) => {
+    // authenticate with SQL server
+
     socket.on('add user', (username) => {
         if (socket.player) {
             return;
         } else {
-            socket.player = new Player(username, 1000);
+            socket.player = new Player(username, socket);
             socket.broadcast.emit('user joined', {
-                username: socket.player.username,
+                username: socket.player.name,
                 numPeople: 231312
+            });
+        }
+    });
+
+    socket.on('game action', (action) => {
+        if (action) {
+            // validate action
+            socketIOServer.emit('game action', {
+                username: socket.player.name,
+                action: action
             });
         }
     });
@@ -29,7 +57,7 @@ socketIOServer.on("connection", (socket) => {
     socket.on('chat message', (message) => {
         if (message && message.text) {
             socketIOServer.emit('chat message', {
-                username: socket.player.username,
+                username: socket.player.name,
                 text: message.text
             });
         }

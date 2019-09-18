@@ -70,7 +70,7 @@
                 <button id="seeBoth" type="button">Both</button>
                 <button id="clearChat" type="button">Clear Chat</button>
             </div>
-            <input id="chatInputBox" type="text" spellcheck=false autocomplete="off" />
+            <input id="chatInputBox" type="text" spellcheck=false autocomplete="off" minlength="1"/>
         </form>
         <main id="roomGame">
 
@@ -87,6 +87,11 @@
         const chatSocket = io();
         const chat = document.getElementById('roomChat');
         const chatInput = document.getElementById('chatInputBox');
+
+        document.getElementById('chatFilter').addEventListener('click', (event)=>{});
+        document.getElementById('logFilter').addEventListener('click', (event)=>{});
+        document.getElementById('seeBoth').addEventListener('click', (event)=>{});
+        document.getElementById('clearChat').addEventListener('click', (event)=>{});
 
         chatSocket.on('connect', () => {
             chatSocket.emit('add user', myUsername);
@@ -108,19 +113,19 @@
 
         chatSocket.on('user joined', (userWhoJoined) => {
             let listItem = document.createElement('li');
-            listItem.textContent = `${userWhoJoined.username} has joined, ${userWhoJoined.numPeople} in room`;
+            listItem.textContent = `[${new Date().toLocaleTimeString()}] ${userWhoJoined.username} has joined, ${userWhoJoined.numPeople} in room`;
             chat.appendChild(listItem);
         });
 
         chatSocket.on('user left', (userWhoLeft) => {
             let listItem = document.createElement('li');
-            listItem.textContent = `${userWhoLeft.username} has joined, ${userWhoLeft.numPeople} in room`;
+            listItem.textContent = `[${new Date().toLocaleTimeString()}] ${userWhoLeft.username} has joined, ${userWhoLeft.numPeople} in room`;
             chat.appendChild(listItem);
         });
 
         chatSocket.on('chat message', (message) => {
             let listItem = document.createElement('li');
-            listItem.textContent = `${message.username}: ${message.text}`;
+            listItem.textContent = `[${new Date().toLocaleTimeString()}] ${message.username}: ${message.text}`;
             chat.appendChild(listItem);
         });
 
