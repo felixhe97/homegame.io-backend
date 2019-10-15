@@ -1,32 +1,20 @@
+const SocketIO = require('socket.io');
+
 class Player {
     // status: -1 is unseated, 0 is busy but still seated, 1 is seated/folded, 2 is in hand, 3 is in countdown, currently listened to
     constructor(playerID, socket) {
         // authenticate that playerID is valid string
-        if (!playerID || typeof playerID != "string" || !(playerID instanceof String)) {
+        if (!playerID || typeof playerID != "string") {
             // and authenticated???
             throw new Error("Invalid player ID type, has to be string");
-        } else if (!socket || !(socket instanceof SocketIO.socket)) {
+        } else if (!socket) {
             throw new Error("Player not connected to socket");
         } else {
             this.name = playerID;
             this.socket = socket;
             this.rooms = new Map();
+            this.status = -1;
         }
-    }
-
-    join(room) {
-
-    }
-
-    get name() {
-        return this.name;
-    }
-                this.amountOfChips = chips;
-                this.status = -1;
-                this.hand = undefined;
-                this.chipsAtStart = undefined;
-            }
-        } 
     }
 
     get seated() {
@@ -60,7 +48,7 @@ class Player {
     }
 
     // bet/raise
-    bet(betAmount){
+    bet(betAmount) {
         if (typeof betAmount != "number" || !(betAmount instanceof Number)) {
             throw new Error("Bet amount is not a number");
         } else if (betAmount <= 0) {

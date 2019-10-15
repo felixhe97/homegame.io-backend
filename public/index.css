@@ -1,0 +1,44 @@
+.css-grid {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    grid-template-columns: repeat(10, 10%);
+    grid-template-rows: repeat(10, 10%);
+}
+
+#roomHeader {
+    grid-column: 4 / 11;
+    grid-row: 1;
+    background-color: #fff4e6;
+    text-align: center;
+}
+
+#roomChat {
+    grid-column: 1 / 4;
+    grid-row: 1 / 10;
+    overflow: scroll;
+}
+
+#chatForm {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    grid-column: 1 / 4;
+    grid-row: 10 / 11;
+}
+
+#chatButtons {
+    width: 100%;
+    height: 40%;
+}
+
+#chatInputBox {
+    width: 100%;
+    height: 60%;
+    overflow: hidden;
+}
+
+#roomGame {
+    grid-column: 4 / 11;
+    grid-row: 2 / 11;
+}

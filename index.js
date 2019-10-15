@@ -1,3 +1,4 @@
+/*
 const cluster = require('cluster');
 const numberOfCPU = require('os').cpus().length;
 
@@ -19,3 +20,8 @@ cluster.on('exit', (worker, code, signal)=>{
     console.log("Starting a new one");
     cluster.fork();
 });
+*/
+
+// TODO this will be clustering to require('serveStatic.js') and 'app.js'
+// remove express and have static assets served from CDN  
+// then have this require(app.js)
